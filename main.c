@@ -45,7 +45,7 @@ int main(void) {
     // Enable button as input
     gpioEnable(GPIO_PORT_A);
     pinMode(ASIGNAL, GPIO_INPUT);
-    GPIOA->PUPDR |= _VAL2FLD(GPIO_PUPDR_PUPD5, 0b01); // Set PA5 as pull-up
+    GPIOA->PUPDR |= _VAL2FLD(GPIO_PUPDR_PUPD9, 0b01); // Set PA5 as pull-up
 
     pinMode(BSIGNAL, GPIO_INPUT);
     GPIOA->PUPDR |= _VAL2FLD(GPIO_PUPDR_PUPD6, 0b01); // Set PA6 as pull-up
@@ -64,7 +64,7 @@ int main(void) {
     RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
     // 2. Configure EXTICR for the input button interrupt
    // SYSCFG->EXTICR[1] |= _VAL2FLD(SYSCFG_EXTICR1_EXTI2, 0b000); // Select PA2
-    SYSCFG->EXTICR[2] |= _VAL2FLD(SYSCFG_EXTICR2_EXTI5, 0b000); // Select PA5
+    SYSCFG->EXTICR[3] |= _VAL2FLD(SYSCFG_EXTICR3_EXTI9, 0b000); // Select PA5
     SYSCFG->EXTICR[2] |= _VAL2FLD(SYSCFG_EXTICR2_EXTI6, 0b000); // Select PA6
 
     // Enable interrupts globally
@@ -99,11 +99,12 @@ int i;
     speed = 1.0/(120.0*period); 
     printf("clockwise \n");
    }
-    else {
+    if (!cw) {
     period = ((4.0/3.0)*(deltat/1000000.0));
     speed = 1.0/(120.0*period); 
     printf("counter-clockwise \n");
     } 
+
       // printf function call
     printf("Speed:  %f\n", speed);
     delay_millis(TIM2, 200);
@@ -115,9 +116,9 @@ int i;
 void EXTI9_5_IRQHandler(void){
 
     // Check that the button was what triggered our interrupt
-    if (EXTI->PR1 & (1 << 5)){
+    if (EXTI->PR1 & (1 << 9)){
         // If so, clear the interrupt (NB: Write 1 to reset.)
-        EXTI->PR1 |= (1 << 5);
+        EXTI->PR1 |= (1 << 9);
         TIM16->CNT = 0;
         TIM16->EGR |= (1 << 0);
         // if b is high, set direction to clockwise +

@@ -16,7 +16,7 @@
 // Custom defines
 ///////////////////////////////////////////////////////////////////////////////
 
-#define ASIGNAL PA5
+#define ASIGNAL PA9
 #define BSIGNAL PA6
 #define BUTTON_PIN PA4
 #define DELAY_TIM TIM2
