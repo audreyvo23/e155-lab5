@@ -1,3 +1,6 @@
+// Audrey Vo
+// avo@g.hmc.edu
+// 10/31/22 
 // STM32L432KC_FLASH.h
 // Header for FLASH functions
 

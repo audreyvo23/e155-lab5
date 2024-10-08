@@ -16,8 +16,10 @@
 // Custom defines
 ///////////////////////////////////////////////////////////////////////////////
 
-#define LED_PIN PA5
+#define ASIGNAL PA5
+#define BSIGNAL PA6
 #define BUTTON_PIN PA4
 #define DELAY_TIM TIM2
+#define COUNTER_TIM TIM16
 
 #endif // MAIN_H
