@@ -74,7 +74,7 @@ int main(void) {
     // 1. Configure mask bit
     EXTI->IMR1 |= (1 << gpioPinOffset(ASIGNAL)); // Configure the mask bit
     // 2. Disable rising edge trigger
-    EXTI->RTSR1 &= ~(1 << gpioPinOffset(ASIGNAL));// Disable rising edge trigger
+    EXTI->RTSR1 |= (1 << gpioPinOffset(ASIGNAL));// Enable rising edge trigger
     // 3. Enable falling edge trigger
     EXTI->FTSR1 |= (1 << gpioPinOffset(ASIGNAL));// Enable falling edge trigger
     // 4. Turn on EXTI interrupt in NVIC_ISER
@@ -84,7 +84,7 @@ int main(void) {
     // 1. Configure mask bit
     EXTI->IMR1 |= (1 << gpioPinOffset(BSIGNAL)); // Configure the mask bit
     // 2. Disable rising edge trigger
-    EXTI->RTSR1 &= ~(1 << gpioPinOffset(BSIGNAL));// Disable rising edge trigger
+    EXTI->RTSR1 |= (1 << gpioPinOffset(BSIGNAL));// Enable rising edge trigger
     // 3. Enable falling edge trigger
     EXTI->FTSR1 |= (1 << gpioPinOffset(BSIGNAL));// Enable falling edge trigger
     // 4. Turn on EXTI interrupt in NVIC_ISER
@@ -95,18 +95,18 @@ float period;
 int i;
    while(1){  
     if (cw) {
-    period = (4.0*deltat/1000000.0);
-    speed = 1.0/(120.0*period); 
     printf("clockwise \n");
    }
     if (!cw) {
-    period = ((4.0/3.0)*(deltat/1000000.0));
-    speed = 1.0/(120.0*period); 
+    //period = ((4.0/3.0)*(deltat/1000000.0));
+    //speed = 1.0/(120.0*period); 
     printf("counter-clockwise \n");
     } 
-
-      // printf function call
-    printf("Speed:  %f\n", speed);
+    period = (4.0*deltat/1000000.0);
+    speed = 1.0/(120.0*period); 
+    //if(deltat<100) speed = 0.0;
+    // printf function call
+    printf("Speed:  %f rev/s\n", speed);
     delay_millis(TIM2, 200);
 
 }
@@ -115,30 +115,37 @@ int i;
 // interrupt for A
 void EXTI9_5_IRQHandler(void){
 
+int a = digitalRead(ASIGNAL);
+int b = digitalRead(BSIGNAL);
     // Check that the button was what triggered our interrupt
     if (EXTI->PR1 & (1 << 9)){
         // If so, clear the interrupt (NB: Write 1 to reset.)
         EXTI->PR1 |= (1 << 9);
-        TIM16->CNT = 0;
-        TIM16->EGR |= (1 << 0);
+ 
         // if b is high, set direction to clockwise +
-        if (digitalRead(PA6)) {cw = 1;}
-        // if b is low set, direction to counterclockwise -
-        else {cw = 0;}
+       if((a && b) || (!a && !b)) {
+             deltat = TIM16->CNT;
+             cw = 0;
+             
+       }
+         TIM16->CNT = 0;
+          TIM16->EGR |= (1 << 0);
+ 
     }
      // Check that the button was what triggered our interrupt
     if (EXTI->PR1 & (1 << 6)){
         // If so, clear the interrupt (NB: Write 1 to reset.)
         EXTI->PR1 |= (1 << 6);
-     
-       
-        deltat = TIM16->CNT;
-      
-        // reset counter and update register
+
+        if((a && b) || (!a && !b)) {
+             deltat = TIM16->CNT;
+             cw = 1;
+        
+       } 
+// reset counter and update register
         TIM16->CNT = 0;
         TIM16->EGR |= (1 << 0);
-       
-    }
+        }
 }
 
 
